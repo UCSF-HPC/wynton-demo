@@ -2,25 +2,25 @@
 #$ -cwd    ## use current working directory
 #$ -j yes  ## merge stdout and stderr
 
-t0=`date --rfc-3339=seconds`
+t0=$(date --rfc-3339=seconds)
 
 echo "--- Job call ----------------------------------------------------"
 echo "All arguments: $*"
 echo
 
 echo "TMPDIR=$TMPDIR"
-ls -la $TMPDIR || echo "ls -la $TMPDIR failed"
-stat $TMPDIR
+ls -la "$TMPDIR" || echo "ls -la $TMPDIR failed"
+stat "$TMPDIR"
 
 echo "All other TMPDIR folders:"
-ls -lart $(dirname $TMPDIR)
+ls -lart "$(dirname "$TMPDIR")"
 
 
-echo "Hello world" > $TMPDIR/hello.txt
+echo "Hello world" > "$TMPDIR/hello.txt"
 
-cp $TMPDIR/hello.txt .
+cp "$TMPDIR/hello.txt" .
 
-ls -la $TMPDIR || echo "ls -la $TMPDIR failed"
+ls -la "$TMPDIR" || echo "ls -la $TMPDIR failed"
 
-t1=`date --rfc-3339=seconds`
+t1=$(date --rfc-3339=seconds)
 echo "Duration: $t0 -- $t1"

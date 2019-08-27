@@ -1,3 +1,4 @@
 #! /usr/bin/env bash
-echo SHELL=$SHELL
+echo "SHELL=$SHELL"
+
 

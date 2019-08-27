@@ -2,7 +2,7 @@
 #$ -cwd    ## use current working directory
 #$ -j yes  ## merge stdout and stderr
 
-t0=`date --rfc-3339=seconds`
+t0=$(date --rfc-3339=seconds)
 
 echo "--- Job call ----------------------------------------------------"
 echo "All arguments: $*"
@@ -14,7 +14,7 @@ echo
 
 if [[ -f "$PE_HOSTFILE" ]]; then
   echo "Content of PE_HOSTFILE: $PE_HOSTFILE"
-  cat $PE_HOSTFILE
+  cat "$PE_HOSTFILE"
   echo
 fi
 
@@ -23,8 +23,8 @@ env
 echo
 
 echo "--- End-of-job summary ------------------------------------------"
-qstat -j $JOB_ID
+qstat -j "$JOB_ID"
 echo
 
-t1=`date --rfc-3339=seconds`
+t1=$(date --rfc-3339=seconds)
 echo "Duration: $t0 -- $t1"

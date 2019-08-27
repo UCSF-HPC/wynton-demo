@@ -10,5 +10,4 @@ sleep 10
 >&2 echo "ERROR: boom!" || exit 1
 
 ## End-of-job summary
-qstat -j $JOB_ID
-
+qstat -j "$JOB_ID"
