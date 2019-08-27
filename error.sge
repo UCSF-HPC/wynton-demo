@@ -1,0 +1,14 @@
+#! /usr/bin/sh
+#$ -N demo-error  ## job name
+#$ -cwd           ## preserve working directory
+
+echo "This job script produces an error below"
+
+echo "Sleeping for 10 seconds ..."
+sleep 10
+
+>&2 echo "ERROR: boom!" || exit 1
+
+## End-of-job summary
+qstat -j $JOB_ID
+
