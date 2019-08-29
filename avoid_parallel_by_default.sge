@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+#$ -N avoid_parallel_by_default  ## job name
+#$ -cwd                          ## preserve working directory
+#$ -j yes                        ## merge stdout and stderr
+
+## Environment variables setting single-thread processing by default
+env | grep THREADS
+env | grep FUTURE
+
+## Examples of using these from R
+module load CBI r
+
+## R_FUTURE_AVAILABLECORES_FALLBACK
+Rscript --vanilla -e "future::availableCores()"
+(unset R_FUTURE_AVAILABLECORES_FALLBACK; Rscript --vanilla -e "future::availableCores()")
+
+## OMP_NUM_THREADS
+Rscript --vanilla -e "data.table::getDTthreads()"
+(unset OMP_NUM_THREADS; Rscript --vanilla -e "data.table::getDTthreads()")
