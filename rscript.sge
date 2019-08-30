@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+#$ -cwd            ## preserve working directory
+#$ -j yes          ## merge stdout and stderr
+
+## Usage:
+## ./rscript.sge
+## qsub rscript.sge
+
+echo "Running $0 ..."
+
+## Required Linux environment modules
+module load CBI r
+
+Rscript rscript.R
+
+## End-of-job summary
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+
+echo "Running $0 ... done"
