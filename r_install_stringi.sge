@@ -1,0 +1,30 @@
+#! /usr/bin/env bash
+#$ -cwd            ## preserve working directory
+#$ -j yes          ## merge stdout and stderr
+
+## Usage:
+## ./r_install_stringi.sge
+## qsub r_install_stringi.sge
+
+echo "Running $0 ..."
+
+## Required Linux environment modules
+module load CBI r
+Rscript --version
+echo "R_ENVIRON=$R_ENVIRON"
+echo "R_PROFILE=$R_PROFILE"
+Rscript -e 'getOption("repos")' -e 'Sys.getenv("ICUDT_DIR")'
+
+## Use R package repositories available on the local file system
+## and local ICUDT_DIR folder needed to install 'stringi'
+module load CBI r-siteconfig
+echo "R_ENVIRON=$R_ENVIRON"
+echo "R_PROFILE=$R_PROFILE"
+Rscript -e 'getOption("repos")' -e 'Sys.getenv("ICUDT_DIR")'
+
+Rscript -e 'install.packages("stringi")'
+
+## End-of-job summary
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+
+echo "Running $0 ... done"
