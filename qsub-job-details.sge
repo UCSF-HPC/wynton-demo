@@ -9,7 +9,7 @@ echo "All arguments: $*"
 echo
 
 echo "--- Summary of SGE specific environment variables ---------------"
-env | grep -E "^(NSLOTS|NHOSTS|PE_HOSTFILE|JOB_|SGE_|HOSTNAME|SHELL)"
+env | grep -E "^(NSLOTS|NHOSTS|PE_HOSTFILE|JOB_|SGE_|HOSTNAME|SHELL|TMPDIR)"
 echo
 
 if [[ -f "$PE_HOSTFILE" ]]; then
