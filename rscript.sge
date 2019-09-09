@@ -1,6 +1,8 @@
 #! /usr/bin/env bash
-#$ -cwd            ## preserve working directory
-#$ -j yes          ## merge stdout and stderr
+#$ -cwd             ## preserve working directory
+#$ -j yes           ## merge stdout and stderr
+#$ -l mem_free=2G   ## request slot with 2 GiB of RAM
+#$ -l h_rt=00:05:00 ## need to run for at most 5 minutes
 
 ## Usage:
 ## ./rscript.sge
