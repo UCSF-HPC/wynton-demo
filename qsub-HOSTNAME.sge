@@ -1,0 +1,17 @@
+#!/bin/env bash
+#$ -cwd    ## use current working directory
+#$ -j yes  ## merge stdout and stderr
+
+## Usage:
+##
+## Run on a specific host
+## qsub -l hostname=mac-id1 qsub-HOSTNAME.sge
+##
+## Run anywhere except one specific host
+## qsub -l hostname='!mac-id1' qsub-HOSTNAME.sge
+##
+## Run anywhere except two specific hosts
+## qsub -l hostname='!(mac-id1|mac-id2)' qsub-HOSTNAME.sge
+
+echo "HOSTNAME=$HOSTNAME"
+
