@@ -1,0 +1,21 @@
+#! /usr/bin/env bash
+#$ -cwd             ## preserve working directory
+#$ -j yes           ## merge stdout and stderr
+#$ -l mem_free=2G   ## request slot with 2 GiB of RAM
+#$ -l h_rt=00:05:00 ## need to run for at most 5 minutes
+
+## Usage:
+## ./rscript.sge
+## qsub rscript.sge
+
+echo "Running $0 ..."
+
+## Required Linux environment modules
+module load CBI r
+
+Rscript rscript.R
+
+## End-of-job summary
+[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+
+echo "Running $0 ... done"
