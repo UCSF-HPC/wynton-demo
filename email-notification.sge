@@ -1,0 +1,13 @@
+#! /usr/bin/sh
+#$ -N demo-email  ## job name
+#$ -cwd           ## preserve working directory
+#$ -m bea         ## send email when job (b)egins, (e)nds, or (a)borts
+
+echo "Example script that sends an email upon completion"
+
+date --rfc-3339=seconds
+
+sleep 30
+
+## End-of-job summary
+qstat -j "$JOB_ID"
