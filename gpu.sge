@@ -1,0 +1,13 @@
+#!/bin/env bash
+#$ -N demo-gpu  ## job name
+#$ -cwd         ## use current working directory
+#$ -j yes       ## merge stdout and stderr
+
+t0=$(date --rfc-3339=seconds)
+
+echo "QUEUE: $QUEUE"
+echo "SGE_GPU: $SGE_GPU"
+export CUDA_VISIBLE_DEVICES=$SGE_GPU
+
+t1=$(date --rfc-3339=seconds)
+echo "Duration: $t0 -- $t1"
