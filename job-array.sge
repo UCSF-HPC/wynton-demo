@@ -1,0 +1,15 @@
+#!/bin/env bash
+#$ -N demo-job-array  ## job name
+#$ -cwd               ## use current working directory
+#$ -j yes             ## merge stdout and stderr
+#$ -t 1-5             ## job array with 5 tasks
+
+t0=$(date --rfc-3339=seconds)
+
+echo "SGE_TASK_ID: $SGE_TASK_ID"
+
+## Wait X seconds where X is a random number in [1,60]
+sleep "$((1 + $RANDOM % 60))"
+
+t1=$(date --rfc-3339=seconds)
+echo "Duration: $t0 -- $t1"
