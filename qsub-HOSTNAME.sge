@@ -1,6 +1,6 @@
 #!/bin/env bash
 #$ -cwd    ## use current working directory
-11;rgb:2e2e/3434/3636#$ -j yes  ## merge stdout and stderr
+#$ -j yes  ## merge stdout and stderr
 
 ## Usage:
 ##
