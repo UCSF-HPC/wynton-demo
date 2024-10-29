@@ -45,6 +45,7 @@
 #' Author: Henrik Bengtsson
 #' License: MIT
 ############################################################################
+#shellcheck disable=SC2120
 fuse_tmpdir() {
     local debug tmpdir tmpimg
     local sge_scratch
@@ -64,7 +65,7 @@ fuse_tmpdir() {
     debug=${FUSE_DEBUG:-false}
 
     ## Default size is 1024 MiB
-    size_org=${FUSE_TMPDIR_DEFAULT:1G}
+    size_org=${FUSE_TMPDIR_DEFAULT:-1G}
     
     # Parse command-line options
     while [[ $# -gt 0 ]]; do
@@ -185,12 +186,17 @@ fuse_tmpdir_teardown() {
 ############################################################################
 ## Main script
 ############################################################################
-echo "Before TMPDIR=${TMPDIR}"
-## Setup size-limited TMPDIR
-eval "$(fuse_tmpdir --default=1G --debug)"
-echo "After TMPDIR=${TMPDIR}"
-
+echo "TMPDIR before: ${TMPDIR}"
 df -h "${TMPDIR}"
+
+echo "Setting up size-limited TMPDIR"
+## Setup size-limited TMPDIR
+eval "$(fuse_tmpdir)"
+
+echo "TMPDIR after: ${TMPDIR}"
+df -h "${TMPDIR}"
+
+echo "Using size-limited TMPDIR"
 td=$(mktemp -d)
 echo "td=${td}"
 date > "${td}"/now
