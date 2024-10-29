@@ -165,13 +165,8 @@ fuse_tmpdir_teardown() {
     tmpdir=${1:?}
     tmpimg=${2:?}
     debug=${FUSE_DEBUG:false}
-    if ${debug}; then
-	{
-	    echo "fuse_tmpdir_teardown() ..."
-            echo "  tmpdir=${tmpdir}"
-            echo "  tmpimg=${tmpimg}"
-	} >&2
-    fi
+    
+    ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
     fusermount -u "${tmpdir}"
     ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
     rmdir "${tmpdir}"
