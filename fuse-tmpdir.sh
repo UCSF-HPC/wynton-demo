@@ -48,13 +48,14 @@
 #shellcheck disable=SC2120
 fuse_tmpdir() {
     local debug tmpdir tmpimg
+    local cmd
     local sge_scratch
     local exit_trap
     local size_org size
     local -i size_MiB
 
     fatal() {
-        >&2 echo "ERROR: ${1:?}"
+        >&2 echo "[fuse_tmpdir] ERROR: ${1:?}"
         echo "exit 1"
         exit 1
     }
@@ -87,7 +88,12 @@ fuse_tmpdir() {
     done
 
     ${debug} && echo >&2 "fuse_tmpdir_setup() ..."
-    
+
+    ## Assert required tools are available
+    for cmd in dd fuse2fs fusermount mkfs.ext4; do
+        command -v "${cmd}" > /dev/null || fatal "Command '${cmd}' not found"
+    done
+
     ## Set debug mode
     FUSE_DEBUG=${debug}
     export FUSE_DEBUG
@@ -110,7 +116,7 @@ fuse_tmpdir() {
 	
 	## Assert SGE flag '-notify' was specified
         if ! qstat -j "${JOB_ID}" | grep -q -E "^notify:[[:blank:]]*TRUE"; then
-            fatal "fuse_tmpdir() requires that SGE flag '-notify' is specified"
+            fatal "SGE flag '-notify' is not specified"
 	fi
 	
 	## Get '-l scratch=<size>' specification
