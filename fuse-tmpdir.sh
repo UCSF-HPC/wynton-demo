@@ -154,7 +154,7 @@ fuse_tmpdir() {
     
     ${debug} && echo >&2 "fuse_tmpdir_setup() ... done"
 
-    echo "TMPDIR='${TMPDIR}'; export TMPDIR; ${exit_trap}"
+    echo "TMPDIR='${TMPDIR}'; export TMPDIR; FUSE_DEBUG=${FUSE_DEBUG}; ${exit_trap}"
 } # fuse_tmpdir()
 
 
@@ -163,7 +163,7 @@ fuse_tmpdir_teardown() {
     
     tmpdir=${1:?}
     tmpimg=${2:?}
-    debug=${FUSE_DEBUG:false}
+    debug=${FUSE_DEBUG:-false}
     
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
     fusermount -u "${tmpdir}"
@@ -185,7 +185,7 @@ df -h "${TMPDIR}"
 
 echo "Setting up size-limited TMPDIR"
 ## Setup size-limited TMPDIR
-eval "$(fuse_tmpdir)"
+eval "$(fuse_tmpdir --debug)"
 
 echo "TMPDIR after: ${TMPDIR}"
 df -h "${TMPDIR}"
@@ -197,5 +197,7 @@ date > "${td}"/now
 cat "${td}"/now
 
 
-echo "--- Job summary -------------------------------------------------"
-[[ -n "$JOB_ID" ]] && qstat -j "$JOB_ID"
+if [[ -n "$JOB_ID" ]]; then
+    echo "--- Job summary -------------------------------------------------"
+    qstat -j "$JOB_ID"
+fi    
