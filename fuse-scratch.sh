@@ -8,7 +8,7 @@
 ############################################################################
 ## Setup temporary FUSE folder for TMPDIR
 ############################################################################
-## Set to 'false' to disable debug output
+## Set to 'true' to enable debug output
 FUSE_DEBUG=false
 
 ## Scratch storage requested via -l scratch=<size> (in bytes)?
