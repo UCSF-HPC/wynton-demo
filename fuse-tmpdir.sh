@@ -54,10 +54,8 @@ fuse_tmpdir() {
     local -i size_MiB
 
     fatal() {
-        >&2 echo "ERROR: ${1:?}. Will now kill the current process (PID=$$) ..."
-        kill -SIGUSR2 "$$"
-        sleep 10
-        kill -KILL "$$" >& /dev/null
+        >&2 echo "ERROR: ${1:?}"
+        echo "exit 1"
         exit 1
     }
 
@@ -80,7 +78,7 @@ fuse_tmpdir() {
 	    if [[ "${key}" == "default" ]]; then
 		## Assert proper format
 		if ! grep -q -E '^[[:digit:]]+(|K|M|G|T)$' <<< "${value}"; then
-                     fatal "Unknown value: ${1}"
+                     fatal "Unknown size: ${1}"
 		fi
 		size_org=${value}
             fi
@@ -168,7 +166,7 @@ fuse_tmpdir_teardown() {
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
     fusermount -u "${tmpdir}"
     ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
-    rmdir "${tmpdir}"
+    rm -r -f "${tmpdir}"
     ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
     rm "${tmpimg}"
     ${debug} && >&2 echo "  Removed EXT4 image file '${tmpimg}'"
