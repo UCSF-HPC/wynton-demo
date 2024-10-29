@@ -1,0 +1,37 @@
+Filesystem                                        Size Used Available Use% Mounted on
+/scratch/250413.1.long.q/tmp.ip2q2ahCK6.tmp.img    19G  44M       18G   1% /scratch/250413.1.long.q/tmp.iDhXaWhSyc.tmp
+td=/scratch/250413.1.long.q/tmp.iDhXaWhSyc.tmp/tmp.rZlO9IRB3X
+Mon Oct 28 19:08:21 PDT 2024
+--- Job summary -------------------------------------------------
+==============================================================
+job_number:                 250413
+exec_file:                  job_scripts/250413
+submission_time:            Mon Oct 28 19:06:59 2024
+owner:                      hb-test
+uid:                        60839
+group:                      lsd
+gid:                        900
+sge_o_home:                 /wynton/home/bengtsson/hb-test
+sge_o_log_name:             hb-test
+sge_o_path:                 /wynton/home/bengtsson/hb-test/.local/bin:/wynton/home/bengtsson/hb-test/bin:/opt/sge/bin:/opt/sge/bin/lx-amd64:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+sge_o_shell:                /bin/bash
+sge_o_workdir:              /wynton/home/bengtsson/hb-test/repositories/wynton-demo
+sge_o_host:                 log1
+account:                    sge
+cwd:                        /wynton/home/bengtsson/hb-test/repositories/wynton-demo
+merge:                      y
+hard resource_list:         h_rt=300,scratch=20G
+mail_list:                  hb-test@log1
+notify:                     FALSE
+job_name:                   fuse-scratch.sh
+jobshare:                   0
+hard_queue_list:            !*gpu.q
+shell_list:                 NONE:/bin/bash
+env_list:                   TERM=NONE
+script_file:                fuse-scratch.sh
+project:                    bengtssonlab
+binding:                    NONE
+job_type:                   NONE
+usage         1:            cpu=00:00:14, mem=0.03788 GB s, io=78.63173 GB, vmem=4.852M, maxvmem=6.441M
+binding       1:            NONE
+scheduling info:            (Collecting of scheduler job information is turned off)
