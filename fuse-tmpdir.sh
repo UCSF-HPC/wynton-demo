@@ -26,7 +26,7 @@
 #'
 #' Requirements:
 #'   SGE jobs must be submitted with the SGE flag '-notify'. If not, an
-#'   error is thrown and the current process is killed.
+#'   error is thrown and the current process is exited.
 #'
 #' Environment variables:
 #'   FUSE_TMPDIR_DEFAULT    The default value of '--default=<value>'
