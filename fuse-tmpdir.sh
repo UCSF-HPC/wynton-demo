@@ -123,7 +123,6 @@ fuse_tmpdir() {
             ${debug} && >&2 echo "  - Using SGE requested /scratch storage size: ${size_MiB} MiB"
         fi
     else
-        size_MiB=1024 ## Default is 1024 MiB
         ${debug} && >&2 echo "  - Using default /scratch storage size: ${size_MiB} MiB"
     fi
 
