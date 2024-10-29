@@ -1,18 +1,18 @@
-TMPDIR before: /scratch/281286.1.long.q
+TMPDIR before: /scratch/281377.1.long.q
 Filesystem   Size Used Available Use% Mounted on
-/dev/sda7    2.9T  30G      2.9T   2% /scratch
+/dev/sda7    3.4T 102G      3.3T   3% /scratch
 Setting up size-limited TMPDIR
-TMPDIR after: /scratch/281286.1.long.q/fuse_tmpdir.E9ocHn.TMPDIR
+TMPDIR after: /scratch/281377.1.long.q/fuse_tmpdir.jrV1zl.TMPDIR
 Filesystem                                                Size Used Available Use% Mounted on
-/scratch/281286.1.long.q/fuse_tmpdir.guoK83.TMPDIR.ext4    19G  44M       18G   1% /scratch/281286.1.long.q/fuse_tmpdir.E9ocHn.TMPDIR
+/scratch/281377.1.long.q/fuse_tmpdir.SJkmcI.TMPDIR.ext4    19G  44M       18G   1% /scratch/281377.1.long.q/fuse_tmpdir.jrV1zl.TMPDIR
 Using size-limited TMPDIR
-td=/scratch/281286.1.long.q/fuse_tmpdir.E9ocHn.TMPDIR/tmp.Z01Mr5phah
-Tue Oct 29 12:40:28 PDT 2024
+td=/scratch/281377.1.long.q/fuse_tmpdir.jrV1zl.TMPDIR/tmp.eEnramfHct
+Tue Oct 29 12:49:30 PDT 2024
 --- Job summary -------------------------------------------------
 ==============================================================
-job_number:                 281286
-exec_file:                  job_scripts/281286
-submission_time:            Tue Oct 29 12:38:18 2024
+job_number:                 281377
+exec_file:                  job_scripts/281377
+submission_time:            Tue Oct 29 12:47:59 2024
 owner:                      hb
 uid:                        34002
 group:                      cbi
@@ -38,11 +38,6 @@ script_file:                fuse-tmpdir.sh
 project:                    bengtssonlab
 binding:                    NONE
 job_type:                   NONE
-usage         1:            cpu=00:00:16, mem=0.04484 GB s, io=79.58705 GB, vmem=15.285M, maxvmem=18.844M
+usage         1:            cpu=00:00:20, mem=0.05327 GB s, io=78.76410 GB, vmem=15.336M, maxvmem=24.922M
 binding       1:            NONE
 scheduling info:            (Collecting of scheduler job information is turned off)
-fuse_tmpdir_teardown() ...
-  Unmounted FUSE TMPDIR folder '/scratch/281286.1.long.q/fuse_tmpdir.E9ocHn.TMPDIR'
-  Removed FUSE TMPDIR folder '/scratch/281286.1.long.q/fuse_tmpdir.E9ocHn.TMPDIR'
-  Removed EXT4 image file '/scratch/281286.1.long.q/fuse_tmpdir.guoK83.TMPDIR.ext4'
-fuse_tmpdir_teardown() ... done

@@ -185,7 +185,7 @@ df -h "${TMPDIR}"
 
 echo "Setting up size-limited TMPDIR"
 ## Setup size-limited TMPDIR
-eval "$(fuse_tmpdir --debug)"
+eval "$(fuse_tmpdir)"
 
 echo "TMPDIR after: ${TMPDIR}"
 df -h "${TMPDIR}"
