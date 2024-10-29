@@ -172,11 +172,11 @@ fuse_tmpdir_teardown() {
 	} >&2
     fi
     fusermount -u "${tmpdir}"
-    ${debug} && >&2 echo "  Unmounted '${tmpdir}'"
+    ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
     rmdir "${tmpdir}"
-    ${debug} && >&2 echo "  Removed '${tmpdir}'"
+    ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
     rm "${tmpimg}"
-    ${debug} && >&2 echo "  Removed '${tmpimg}'"
+    ${debug} && >&2 echo "  Removed EXT4 image file '${tmpimg}'"
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ... done"
 } # fuse_tmpdir_teardown()
 
