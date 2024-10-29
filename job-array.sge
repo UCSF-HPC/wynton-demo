@@ -6,7 +6,9 @@
 
 t0=$(date --rfc-3339=seconds)
 
-echo "SGE_TASK_ID: $SGE_TASK_ID"
+echo "HOSTNAME: ${HOSTNAME}"
+echo "TMPDIR: ${TMPDIR}"
+echo "SGE_TASK_ID: ${SGE_TASK_ID}"
 
 ## Wait X seconds where X is a random number in [1,60]
 sleep "$((1 + $RANDOM % 60))"
