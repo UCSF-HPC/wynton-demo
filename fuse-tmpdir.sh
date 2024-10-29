@@ -1,6 +1,6 @@
 #!/bin/env bash
 #$ -S /bin/bash     # the shell language when run via the job scheduler [IMPORTANT]
-## -notify          # tell SGE to shut down job nicely [IMPORTANT]
+#$ -notify          # tell SGE to shut down job nicely [IMPORTANT]
 #$ -cwd             # use current working directory
 #$ -j yes           # merge stdout and stderr
 #$ -l h_rt=00:05:00 # 5 minutes of runtime
