@@ -121,11 +121,12 @@ fuse_tmpdir() {
 	
 	## Get '-l scratch=<size>' specification
         sge_scratch=$(qstat -xml -j "${JOB_ID}" | awk '/<CE_name>scratch<\/CE_name>/ {found=1} /<\/qstat_l_requests>/ {found=0} found && /<CE_doubleval>/ {print gensub(/.*<CE_doubleval>(.*)<\/CE_doubleval>.*/, "\\1", "g")}')
-        if [[ -n "${sge_scratch}" ]]; then
-            size_MiB=$(printf "%.0f" "${sge_scratch}")
-            size_MiB=$((size_MiB / 1024 / 1024))
-            ${debug} && >&2 echo "  - Using SGE requested /scratch storage size: ${size_MiB} MiB"
+        if [[ -z "${sge_scratch}" ]]; then
+            fatal "SGE option '-l scratch=<size>' was not specified"
         fi
+        size_MiB=$(printf "%.0f" "${sge_scratch}")
+        size_MiB=$((size_MiB / 1024 / 1024))
+        ${debug} && >&2 echo "  - Using SGE requested /scratch storage size: ${size_MiB} MiB"
     else
         ${debug} && >&2 echo "  - Using default /scratch storage size: ${size_MiB} MiB"
     fi
