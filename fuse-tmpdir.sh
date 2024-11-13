@@ -53,6 +53,7 @@ fuse_tmpdir() {
     local exit_trap
     local size_org size
     local -i size_MiB
+    local -a bfr
 
     fatal() {
         >&2 echo "[fuse_tmpdir] ERROR: ${1:?}"
@@ -113,17 +114,21 @@ fuse_tmpdir() {
     ## An SGE job?
     if [[ -n "$JOB_ID" ]]; then
         ${debug} && echo >&2 "  - Detected SGE job (JOB_ID=${JOB_ID})"
-	
+
+        ## Collect job info
+	mapfile -t bfr < <(qstat -xml -j "${JOB_ID}")
+        
 	## Assert SGE flag '-notify' was specified
-        if ! qstat -j "${JOB_ID}" | grep -q -E "^notify:[[:blank:]]*TRUE"; then
+        if ! printf "%s\n" "${bfr[@]}" | grep -q -F '<JB_notify>true</JB_notify>'; then
             fatal "SGE flag '-notify' is not specified"
 	fi
 	
 	## Get '-l scratch=<size>' specification
-        sge_scratch=$(qstat -xml -j "${JOB_ID}" | awk '/<CE_name>scratch<\/CE_name>/ {found=1} /<\/qstat_l_requests>/ {found=0} found && /<CE_doubleval>/ {print gensub(/.*<CE_doubleval>(.*)<\/CE_doubleval>.*/, "\\1", "g")}')
+        sge_scratch=$(printf "%s\n" "${bfr[@]}" | awk '/<CE_name>scratch<\/CE_name>/ {found=1} /<\/qstat_l_requests>/ {found=0} found && /<CE_doubleval>/ {print gensub(/.*<CE_doubleval>(.*)<\/CE_doubleval>.*/, "\\1", "g")}')
         if [[ -z "${sge_scratch}" ]]; then
             fatal "SGE option '-l scratch=<size>' was not specified"
         fi
+        
         size_MiB=$(printf "%.0f" "${sge_scratch}")
         size_MiB=$((size_MiB / 1024 / 1024))
         ${debug} && >&2 echo "  - Using SGE requested /scratch storage size: ${size_MiB} MiB"
