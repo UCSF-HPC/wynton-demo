@@ -136,22 +136,24 @@ fuse_tmpdir() {
         ${debug} && >&2 echo "  - Using default /scratch storage size: ${size_MiB} MiB"
     fi
 
-    ## Allocate ${size_MiB} bytes of temporary EXT4 image
+    ## Allocate ${size_MiB} bytes of temporary ext4 image
     tmpimg=$(mktemp --suffix=.TMPDIR.ext4 --tmpdir "fuse_tmpdir.XXXXXX")
-    ${debug} && >&2 echo "  - Allocating EXT4 image file of size ${size_MiB} MiB: ${tmpimg}"
-    trap '{ rm "${tmpimg}"; }' EXIT   ## undo, in case EXT4 allocation fails
+    ${debug} && >&2 echo "  - Allocating ext4 image file of size ${size_MiB} MiB: ${tmpimg}"
+    trap '{ rm "${tmpimg}"; }' EXIT   ## undo, in case ext4 allocation fails
     dd status="none" if=/dev/zero of="${tmpimg}" bs="1M" count="${size_MiB}"
     mkfs.ext4 -q -O "^has_journal" -F "${tmpimg}"
     ${debug} && >&2 ls -l "${tmpimg}"
     ${debug} && >&2 file "${tmpimg}"
     trap '' EXIT                      ## undo above undo
 
-    ## Mount it using FUSE
-    tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
-    fuse2fs -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"
-
     exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\" \"${tmpimg}\"; }' EXIT"
     ${debug} && >&2 echo "  - EXIT trap: ${exit_trap}"
+
+    ## Mount it using FUSE
+    tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
+    if ! fuse2fs -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"; then
+        fatal "'fuse2fs' failed (exit code $?) to mount $((size_MiB))-MiB Ext4 '${tmpimg}' as temporary TMPDIR='${tmpdir}'"
+    fi
 
     TMPDIR=${tmpdir}
     if ${debug}; then
@@ -181,7 +183,7 @@ fuse_tmpdir_teardown() {
     rm -r -f "${tmpdir}"
     ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
     rm "${tmpimg}"
-    ${debug} && >&2 echo "  Removed EXT4 image file '${tmpimg}'"
+    ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ... done"
 } # fuse_tmpdir_teardown()
 
