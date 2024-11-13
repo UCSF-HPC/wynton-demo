@@ -148,7 +148,7 @@ fuse_tmpdir() {
 
     ## Mount it using FUSE
     tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
-    exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\" \"${tmpimg}\"; }' EXIT"
+    exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\"; }' EXIT"
     ${debug} && >&2 echo "  - EXIT trap: ${exit_trap}"
 
     if ! fuse2fs -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"; then
@@ -174,6 +174,11 @@ fuse_tmpdir() {
     ${debug} && >&2 echo "  - TMPDIR is writable"
 
 
+    ## Record the ext4 image file inside TMPDIR
+    mkdir "${tmpdir}/.fuse-tmpdir" || fatal "Temporary TMPDIR folder is not writable: ${tmpdir}"
+    echo "${tmpimg}" > "${tmpdir}/.fuse-tmpdir/tmpimg"
+    chmod 400 "${tmpdir}/.fuse-tmpdir" "${tmpdir}/.fuse-tmpdir/tmpimg"
+    
     TMPDIR=${tmpdir}
     if ${debug}; then
         {
@@ -190,19 +195,29 @@ fuse_tmpdir() {
 
 
 fuse_tmpdir_teardown() {
-    local debug tmpdir tmpimg
+    local debug file tmpdir tmpimg
     
-    tmpdir=${1:?}
-    tmpimg=${2:?}
+    tmpdir=${1:-${TMPDIR}}
     debug=${FUSE_DEBUG:-false}
     
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
+    file="${TMPDIR}/.fuse-tmpdir/tmpimg"
+    if [[ -f "${file}" ]]; then
+        tmpimg=$(cat "${file}")
+    else
+        ${debug} && >&2 echo "WARNING: Failed to identify the ext4 image file for FUSE TMPDIR folder '${tmpdir}'"
+    fi
+    
     fusermount -u "${tmpdir}"
     ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
     rm -r -f "${tmpdir}"
     ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
-    rm "${tmpimg}"
-    ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
+
+    if [[ -n "${tmpimg}" ]]; then
+        rm "${tmpimg}"
+        ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
+    fi
+    
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ... done"
 } # fuse_tmpdir_teardown()
 
@@ -227,6 +242,11 @@ echo "td=${td}"
 date > "${td}"/now
 cat "${td}"/now
 
+ls -l -a -R "${TMPDIR}"
+
+tmpimg=$(cat "${TMPDIR}/.fuse-tmpdir/tmpimg")
+file "${tmpimg}"
+stat "${tmpimg}"
 
 if [[ -n "$JOB_ID" ]]; then
     echo "--- Job summary -------------------------------------------------"
