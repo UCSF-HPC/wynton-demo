@@ -146,17 +146,25 @@ fuse_tmpdir() {
     ${debug} && >&2 file "${tmpimg}"
     trap '' EXIT                      ## undo above undo
 
+    
+    
     ## Mount it using FUSE
     tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
     exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\"; }' EXIT"
     ${debug} && >&2 echo "  - EXIT trap: ${exit_trap}"
+    eval "${exit_trap}"   ## undo, in case mount fails
 
-    if ! fuse2fs -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"; then
+    ## Make tmpdir private
+    chmod 0700 "${tmpdir}"
+
+    ##  -o umask="077"
+    if ! fuse2fs -o "auto_unmount" -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"; then
         fatal "'fuse2fs' failed (exit code $?) to mount $((size_MiB))-MiB Ext4 '${tmpimg}' as temporary TMPDIR='${tmpdir}'"
     fi
     ${debug} && >&2 echo "  - mounted temporary TMPDIR folder"
+    ## Make temporary TMPDIR private
+    chmod 0700 "${tmpdir}"
 
-    
     ## Assert that TMPDIR exists, has the expected content, and is writable
     if [[ ! -d "${tmpdir}" ]]; then
         fatal "Temporary TMPDIR directory does not exist: ${tmpdir}"
@@ -177,7 +185,8 @@ fuse_tmpdir() {
     ## Record the ext4 image file inside TMPDIR
     mkdir "${tmpdir}/.fuse-tmpdir" || fatal "Temporary TMPDIR folder is not writable: ${tmpdir}"
     echo "${tmpimg}" > "${tmpdir}/.fuse-tmpdir/tmpimg"
-    chmod 400 "${tmpdir}/.fuse-tmpdir" "${tmpdir}/.fuse-tmpdir/tmpimg"
+    chmod 400 "${tmpdir}/.fuse-tmpdir/tmpimg"
+    chmod 000 "${tmpdir}/.fuse-tmpdir"
     
     TMPDIR=${tmpdir}
     if ${debug}; then
@@ -187,6 +196,9 @@ fuse_tmpdir() {
             ls -la "${TMPDIR}"
         } >&2
     fi
+
+    ## Reset exit trap
+    trap "" EXIT
     
     ${debug} && echo >&2 "fuse_tmpdir_setup() ... done"
 
@@ -196,7 +208,11 @@ fuse_tmpdir() {
 
 fuse_tmpdir_teardown() {
     local debug file tmpdir tmpimg
-    
+
+    warning() {
+        >&2 echo "[fuse_tmpdir_teardown] WARNING: ${1:?}"
+    }
+
     tmpdir=${1:-${TMPDIR}}
     debug=${FUSE_DEBUG:-false}
     
@@ -205,17 +221,20 @@ fuse_tmpdir_teardown() {
     if [[ -f "${file}" ]]; then
         tmpimg=$(cat "${file}")
     else
-        ${debug} && >&2 echo "WARNING: Failed to identify the ext4 image file for FUSE TMPDIR folder '${tmpdir}'"
+        warning "Failed to identify the ext4 image file for FUSE TMPDIR folder '${tmpdir}'"
     fi
     
     fusermount -u "${tmpdir}"
     ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
-    rm -r -f "${tmpdir}"
     ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
 
     if [[ -n "${tmpimg}" ]]; then
-        rm "${tmpimg}"
-        ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
+        if [[ -f "${tmpimg}" ]]; then
+            rm "${tmpimg}"
+            ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
+        else
+            warning "No such ext4 image file to remove for FUSE TMPDIR folder '${tmpdir}': ${tmpimg}"
+        fi
     fi
     
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ... done"
@@ -235,6 +254,7 @@ eval "$(fuse_tmpdir "$@")"
 
 echo "TMPDIR after: ${TMPDIR}"
 df -h "${TMPDIR}"
+stat "${TMPDIR}"
 
 echo "Using size-limited TMPDIR"
 td=$(mktemp -d)
@@ -244,9 +264,6 @@ cat "${td}"/now
 
 ls -l -a -R "${TMPDIR}"
 
-tmpimg=$(cat "${TMPDIR}/.fuse-tmpdir/tmpimg")
-file "${tmpimg}"
-stat "${tmpimg}"
 
 if [[ -n "$JOB_ID" ]]; then
     echo "--- Job summary -------------------------------------------------"
