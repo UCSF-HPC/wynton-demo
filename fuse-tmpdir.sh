@@ -159,7 +159,7 @@ fuse_tmpdir() {
 
     ##  -o umask="077"
     if ! fuse2fs -o "auto_unmount" -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"; then
-        fatal "'fuse2fs' failed (exit code $?) to mount $((size_MiB))-MiB Ext4 '${tmpimg}' as temporary TMPDIR='${tmpdir}'"
+        fatal "'fuse2fs' failed to mount $((size_MiB))-MiB Ext4 '${tmpimg}' as temporary TMPDIR='${tmpdir}'"
     fi
     ${debug} && >&2 echo "  - mounted temporary TMPDIR folder"
     ## Make temporary TMPDIR private
@@ -209,6 +209,11 @@ fuse_tmpdir() {
 fuse_tmpdir_teardown() {
     local debug file tmpdir tmpimg
 
+    fatal() {
+        >&2 echo "[fuse_tmpdir_teardown] ERROR: ${1:?}"
+        exit 1
+    }
+    
     warning() {
         >&2 echo "[fuse_tmpdir_teardown] WARNING: ${1:?}"
     }
@@ -218,9 +223,13 @@ fuse_tmpdir_teardown() {
     debug=${FUSE_DEBUG:-false}
     
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
+
+    if ! mount | grep -q -E " ${tmpdir} "; then
+        fatal "Cannot unmount a non-FUSE TMPDIR folder: ${tmpdir}"
+    fi
     
     if [[ -z "${tmpimg}" ]]; then
-        file="${TMPDIR}/.fuse-tmpdir/tmpimg"
+        file="${tmpdir}/.fuse-tmpdir/tmpimg"
         if [[ -f "${file}" ]]; then
             tmpimg=$(cat "${file}")
         else
