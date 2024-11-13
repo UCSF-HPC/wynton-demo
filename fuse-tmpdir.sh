@@ -66,7 +66,7 @@ fuse_tmpdir() {
 
     ## Default size is 1024 MiB
     size_org=${FUSE_TMPDIR_DEFAULT:-1G}
-    
+
     # Parse command-line options
     while [[ $# -gt 0 ]]; do
         if [[ ${1} == "--debug" ]]; then
@@ -146,14 +146,33 @@ fuse_tmpdir() {
     ${debug} && >&2 file "${tmpimg}"
     trap '' EXIT                      ## undo above undo
 
+    ## Mount it using FUSE
+    tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
     exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\" \"${tmpimg}\"; }' EXIT"
     ${debug} && >&2 echo "  - EXIT trap: ${exit_trap}"
 
-    ## Mount it using FUSE
-    tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
     if ! fuse2fs -o "fakeroot" -o "rw" -o "uid=$(id -u),gid=$(id -g)" "${tmpimg}" "${tmpdir}"; then
         fatal "'fuse2fs' failed (exit code $?) to mount $((size_MiB))-MiB Ext4 '${tmpimg}' as temporary TMPDIR='${tmpdir}'"
     fi
+    ${debug} && >&2 echo "  - mounted temporary TMPDIR folder"
+
+    
+    ## Assert that TMPDIR exists, has the expected content, and is writable
+    if [[ ! -d "${tmpdir}" ]]; then
+        fatal "Temporary TMPDIR directory does not exist: ${tmpdir}"
+    fi
+    if [[ ! -d "${tmpdir}/lost+found/" ]]; then
+        fatal "Temporary TMPDIR directory does not contain the expected 'lost+found' folder: ${tmpdir}"
+    fi
+    ${debug} && >&2 echo "  - TMPDIR has expected content"
+    tf=$(mktemp)
+    if [[ ! -f "${tf}" ]]; then
+        rm -f "${tf}"
+        fatal "Failed to create a file in the temporary TMPDIR directory: ${tmpdir}"
+    fi
+    rm -f "${tf}"
+    ${debug} && >&2 echo "  - TMPDIR is writable"
+
 
     TMPDIR=${tmpdir}
     if ${debug}; then
@@ -197,7 +216,7 @@ df -h "${TMPDIR}"
 
 echo "Setting up size-limited TMPDIR"
 ## Setup size-limited TMPDIR
-eval "$(fuse_tmpdir)"
+eval "$(fuse_tmpdir "$@")"
 
 echo "TMPDIR after: ${TMPDIR}"
 df -h "${TMPDIR}"
