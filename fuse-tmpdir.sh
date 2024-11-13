@@ -219,7 +219,7 @@ fuse_tmpdir_teardown() {
     
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
     
-    if [[ -z "${tmpimg}"; then
+    if [[ -z "${tmpimg}" ]]; then
         file="${TMPDIR}/.fuse-tmpdir/tmpimg"
         if [[ -f "${file}" ]]; then
             tmpimg=$(cat "${file}")
@@ -227,17 +227,30 @@ fuse_tmpdir_teardown() {
             warning "Failed to identify the ext4 image file for FUSE TMPDIR folder '${tmpdir}'"
         fi
     fi
-          
+
+    if [[ ! -d "${tmpdir}" ]]; then
+        warning "FUSE TMPDIR folder '${tmpdir}' does not exist"
+    fi
+    
     fusermount -u "${tmpdir}"
     ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
-    ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
+    rm -r -f "${tmpdir}"
+    if [[ -d "${tmpdir}" ]]; then
+        warning "Failed to remove FUSE TMPDIR folder '${tmpdir}'"
+    else
+        ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
+    fi
 
     if [[ -n "${tmpimg}" ]]; then
         if [[ -f "${tmpimg}" ]]; then
             rm "${tmpimg}"
-            ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
+            if [[ -f "${tmpimg}" ]]; then
+                warning "Failed to remove ext4 image file '${tmpimg}' for FUSE TMPDIR folder '${tmpdir}"
+            else
+                ${debug} && >&2 echo "  Removed ext4 image file '${tmpimg}'"
+            fi
         else
-            warning "No such ext4 image file to remove for FUSE TMPDIR folder '${tmpdir}': ${tmpimg}"
+            warning "Ext4 image file '${tmpimg}' for FUSE TMPDIR folder '${tmpdir}' did not exist"
         fi
     fi
     
