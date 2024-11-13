@@ -150,7 +150,7 @@ fuse_tmpdir() {
     
     ## Mount it using FUSE
     tmpdir=$(mktemp -d --suffix=.TMPDIR --tmpdir "fuse_tmpdir.XXXXXX")
-    exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\"; }' EXIT"
+    exit_trap="trap '{ fuse_tmpdir_teardown \"${tmpdir}\" \"${tmpimg}\"; }' EXIT"
     ${debug} && >&2 echo "  - EXIT trap: ${exit_trap}"
     eval "${exit_trap}"   ## undo, in case mount fails
 
@@ -214,16 +214,20 @@ fuse_tmpdir_teardown() {
     }
 
     tmpdir=${1:-${TMPDIR}}
+    tmpimg=${2}
     debug=${FUSE_DEBUG:-false}
     
     ${debug} && >&2 echo "fuse_tmpdir_teardown() ..."
-    file="${TMPDIR}/.fuse-tmpdir/tmpimg"
-    if [[ -f "${file}" ]]; then
-        tmpimg=$(cat "${file}")
-    else
-        warning "Failed to identify the ext4 image file for FUSE TMPDIR folder '${tmpdir}'"
-    fi
     
+    if [[ -z "${tmpimg}"; then
+        file="${TMPDIR}/.fuse-tmpdir/tmpimg"
+        if [[ -f "${file}" ]]; then
+            tmpimg=$(cat "${file}")
+        else
+            warning "Failed to identify the ext4 image file for FUSE TMPDIR folder '${tmpdir}'"
+        fi
+    fi
+          
     fusermount -u "${tmpdir}"
     ${debug} && >&2 echo "  Unmounted FUSE TMPDIR folder '${tmpdir}'"
     ${debug} && >&2 echo "  Removed FUSE TMPDIR folder '${tmpdir}'"
