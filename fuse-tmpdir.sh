@@ -7,12 +7,12 @@
 #$ -l scratch=20G   # needs 20 GiB of /scratch space
 
 
-## Load fuse-tmpdir part of wynton-tools
+## Import fuse_tmpdir() from wynton-tools
 module load CBI wynton-tools
 eval "$(wynton utils fuse-tmpdir)"
 
-## Set up size-limited TMPDIR folder
-eval "$(fuse_tmpdir "$@")"
+## Set up size-limited TMPDIR folder (per -l scratch=<size>, if used)
+eval "$(fuse_tmpdir)"
 
 
 ## Using the size-limited TMPDIR folder
