@@ -4,7 +4,7 @@
 #$ -cwd             # use current working directory
 #$ -j yes           # merge stdout and stderr
 #$ -l h_rt=00:05:00 # 5 minutes of runtime
-#$ -l scratch=3G     # needs 3 GiB of /scratch space
+#$ -l scratch=1G    # request 1 GiB of /scratch space
 
 
 ## Import fuse_tmpdir() from wynton-tools
@@ -26,12 +26,12 @@ date > "${td}"/now
 cat "${td}"/now
 
 
-echo "Creating a 1 GiB temporary file"
-dd status="none" if=/dev/zero of="${td}/large" bs="1M" count="$((1 * 1024))"
+echo "Creating a 0.5 GiB temporary file"
+dd status="none" if=/dev/zero of="${td}/large" bs="1M" count="$((1024/2))"
 df -h "${TMPDIR}"
 
 echo "Filling up TMPDIR, resulting in a 'No space left on device' error"
-dd status="none" if=/dev/zero of="${td}/huge" bs="1M" count="$((3 * 1024))"
+dd status="none" if=/dev/zero of="${td}/huge" bs="1M" count="$((1 * 1024))"
 df -h "${TMPDIR}"
 
 
