@@ -165,7 +165,7 @@ fuse_tmpdir() {
         fatal "Temporary TMPDIR directory does not contain the expected 'lost+found' folder: ${tmpdir}"
     fi
     ${debug} && >&2 echo "  - TMPDIR has expected content"
-    tf=$(mktemp)
+    tf=$(mktemp --tmpdir="${tmpdir}")
     if [[ ! -f "${tf}" ]]; then
         rm -f "${tf}"
         fatal "Failed to create a file in the temporary TMPDIR directory: ${tmpdir}"
