@@ -13,8 +13,15 @@
 ## -------------------------------------------------------------------------
 ## Script prologue
 ## -------------------------------------------------------------------------
-## Set up size-limited TMPDIR folder (per -l scratch=<size>, if used)
-## The TMPDIR folder is automatically removed when the script exits
+
+## Set up a pre-allocated, size-limited TMPDIR folder that is automatically
+## removed when the script exits. The size is set by SGE specification
+## '-l scratch=<size>', if specified.
+##
+## There are two advantages with this approach:
+## (1) your TMPDIR is pre-allocated up-front making it unaffected by other
+##     jobs filling up local /scratch, and
+## (2) your job cannot fill up local /scratch by mistake.
 module load CBI wynton-tools
 eval "$(wynton utils --apply fuse-tmpdir)"
 
