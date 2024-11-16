@@ -6,10 +6,15 @@
 #$ -l mem_free=10M
 
 function on_signal {
-  signal=${1:?}
-  echo "[${SECONDS}s]: Caught signal ${signal}"
-  ## Exit on SIGQUIT, e.g. Ctrl+\
-  [[ "${signal}" == "SIGQUIT" ]] && exit 1
+    signal=${1:?}
+    echo "[${SECONDS}s]: Caught signal ${signal}"
+    ## Exit on SIGQUIT, e.g. Ctrl+\
+    [[ "${signal}" == "SIGQUIT" ]] && exit 1
+}
+
+function get_trap {
+    signal=${1:?}
+    trap -p "${signal}" | sed -E 's/(^trap -- |[[:alnum:]+-]+$)//g'
 }
 
 echo "Registering traps for all signals:"
@@ -22,6 +27,12 @@ for signal in "${signals[@]}"; do
     trap "on_signal ${signal}" "${signal}"
 done
 echo
+
+for signal in "${signals[@]}"; do
+    printf "%s: %s\n" "${signal}" "$(get_trap "${signal}")"
+done
+echo
+
 
 echo "Sleep - listen - sleep - listen for up to 5 minutes (press Ctrl-\ to terminate)..."
 while [[ "${SECONDS}" -lt 300 ]]; do
